@@ -1,6 +1,7 @@
 package com.example.order_service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,14 +15,17 @@ public class OrderController {
 
     private final InventoryClient inventoryClient;
 
+    @Value("${server.port}")
+    private String port;
+
     @PostMapping("/{skuCode}")
     public String isInStock(@PathVariable String skuCode){
         boolean inStock = inventoryClient.isInStock(skuCode);
         if (inStock){
-            return "Sipariş başarıyla verildi";
+            return "Sipariş başarıyla verildi. (İşlemi Yapan Port: " + port + ")";
         }
         else {
-            return "Ürün stokta bulunamadı.";
+            return "Ürün stokta bulunamadı.(İşlemi Yapan Port: " + port + ")";
         }
     }
 }
