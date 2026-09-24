@@ -1,5 +1,6 @@
 package com.example.order_service;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ public class OrderController {
     private String port;
 
     @PostMapping("/{skuCode}")
+    @CircuitBreaker(name = "inventory", fallbackMethod = "stokHatasiBPlani")
     public String isInStock(@PathVariable String skuCode){
         boolean inStock = inventoryClient.isInStock(skuCode);
         if (inStock){
@@ -27,5 +29,9 @@ public class OrderController {
         else {
             return "Ürün stokta bulunamadı.(İşlemi Yapan Port: " + port + ")";
         }
+    }
+
+    public String stokHatasiBPlani(@PathVariable String skuCode,Throwable e){
+        return "Şu an yoğunluk var.İşleminiz sıraya alınmıştır. İşlemi yapan port: " + port;
     }
 }
