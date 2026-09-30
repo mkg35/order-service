@@ -3,8 +3,10 @@ package com.example.order_service;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -18,7 +20,12 @@ public class OrderController {
 
     @PostMapping("/{skuCode}")
     @CircuitBreaker(name = "inventory", fallbackMethod = "stokHatasiBPlani")
-    public String isInStock(@PathVariable String skuCode){
+    public String isInStock(@PathVariable String skuCode, @RequestHeader HttpHeaders headers){
+
+        System.out.println("-----Gelen HTTP Başlıkları-----");
+        headers.forEach((key,values) -> System.out.println(key + ": " + values));
+        System.out.println("-------------------------------");
+
         boolean inStock = inventoryClient.isInStock(skuCode);
         if (inStock){
             return "Sipariş başarıyla verildi. (İşlemi Yapan Port: " + port + ")";
